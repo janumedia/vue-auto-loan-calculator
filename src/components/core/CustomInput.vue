@@ -37,21 +37,14 @@ export default {
     methods: {
         handleInput(e) {
             this.$emit('input', e.target.value);
-            if(typeof this.inValid === 'function' && this.inValid()) {
-               this.$el.classList.add('error');
-               this.errorText = this.inValid();
-            } else {
-                this.$el.classList.remove('error');
-                this.errorText = "";
-            }
         },
         handleBlur(e) {
             if(typeof this.inValid === 'function' && this.inValid()) {
-               this.$el.classList.add('error');
+               this.$el.classList.add('custom-input--error');
                this.errorText = this.inValid();
                return;
             }
-            this.$el.classList.remove('error');
+            this.$el.classList.remove('custom-input--error');
             this.errorText = "";
             this.$emit('blur', this);
         }
@@ -104,7 +97,7 @@ input {
     color: red;
     visibility: hidden;
 }
-.error {
+.custom-input--error {
     input {
         color: red;
         border-bottom: 2px solid red;

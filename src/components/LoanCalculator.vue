@@ -41,7 +41,6 @@ export default {
         return {
             carPrice: 25000,
             downPayment: 5000,
-            //loan: 15000,
             monthlyPayment: 0,
             interestRate: 3,
             interestTotal: 0,
@@ -55,7 +54,7 @@ export default {
     computed: {
         loan() {
             return this.carPrice - this.downPayment;
-        },
+        }
     },
     methods: {
         invalidCarPrice() {
@@ -79,6 +78,8 @@ export default {
             return false;
         },
         calculate(e) {
+            //don't process if has error input
+            if(this.$el.querySelector('.custom-input--error')) return;
             //formula reference: https://www.wikihow.com/Calculate-Total-Interest-Paid-on-a-Car-Loan
             let i = this.interestRate * 0.01 / 12;
             let l = Math.pow(1 + i, this.duration);
