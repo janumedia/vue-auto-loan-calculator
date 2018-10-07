@@ -20,6 +20,7 @@ export default {
 <style lang="scss" scoped>
 table {
     border-collapse: collapse;
+    border: 1px solid #ccc;
     width: 100%;
 }
 td, th {
@@ -27,6 +28,10 @@ td, th {
     text-align: left;
     padding: 8px;
     text-align: center;
+}
+th {
+    background-color: rgb(231, 228, 228);
+    border-bottom-width: 2px;
 }
 tr:nth-child(even) {
     background-color: #eee;

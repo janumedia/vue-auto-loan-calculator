@@ -1,5 +1,5 @@
 body {
-    padding: 10px;
+    padding: 20px;
     margin: 0;
 }
 
@@ -9,3 +9,9 @@ li { list-style: none; }
 :focus { outline: none; }
 a { text-decoration: none; outline: none; }
 a img { border: 0; }
+
+@media only screen and (max-width:414px) {
+    body {
+        padding: 0;
+    }
+}
