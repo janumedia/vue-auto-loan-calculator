@@ -18,8 +18,10 @@
                 <h2>Result:</h2>
                 <p>Estimate monthly payment</p>
                 <p class="label-monthly-payment">{{ monthlyPayment }}</p>
+                <br>
                 <p>Total Principal Paid <span class="font--bold">{{ numFormat(principalTotal) }}</span></p>
                 <p>Total Interest Paid <span class="font--bold">{{ numFormat(interestTotal) }}</span></p>
+                <br>
                 <p>Estimated Payoff Date</p>
                 <p class="label-payoff-date">{{ payoffDate }}</p>
             </div>
@@ -190,9 +192,9 @@ export default {
 }
 
 .label-monthly-payment {
-    font-size: 2.2em;
+    font-size: 2.6em;
     font-weight: 700;
-    margin: 0;
+    margin: 20px 0 0;
 }
 
 .label-payoff-date {
