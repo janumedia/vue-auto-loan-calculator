@@ -4,8 +4,11 @@
             <div class="calculator-form">
                 <custom-input type="number" label="Car price" prefix="$" :inValid="invalidCarPrice" @blur="calculate" v-model="carPrice"/>
                 <custom-input label="Downpayment" prefix="$" :inValid="invalidDownpayment" @blur="calculate" v-model="downPayment"/>
-                <custom-input label="Loan duration (in month)" @blur="calculate" v-model="duration"/>
-                <div class="column">
+                <div>
+                    <custom-input label="Loan duration" class="input-duration" @blur="calculate" v-model="duration"/>
+                    <toggle-button @change="calculate" v-model="isYearly"/>
+                </div>
+                <div>
                     <custom-input label="Interest rate" sufix="%" class="input-interest" :inValid="invalidInterestRate" @blur="calculate" v-model="interestRate"/>
                     <custom-input label="Start date" class="input-date" :inValid="invalidStartDate" @blur="calculate" v-model="startDate"/>
                 </div>
@@ -37,10 +40,11 @@
 <script>
 import CustomButton from '@/components/core/CustomButton.vue'
 import CustomInput from '@/components/core/CustomInput.vue'
+import ToggleButton from '@/components/core/ToggleButton.vue'
 import Table from '@/components/Table.vue'
 export default {
     components: {
-        CustomButton, CustomInput, Table
+        CustomButton, CustomInput, ToggleButton, Table
     },
     mounted() {
         this.calculate();
@@ -53,6 +57,7 @@ export default {
             interestRate: 3,
             interestTotal: 0,
             duration: 60,
+            isYearly: false,
             startDate: this.dateFormat(new Date()),
             payoffDate: this.dateFormat(new Date(), true),
             headers: [
@@ -94,16 +99,18 @@ export default {
         calculate(e) {
             //don't process if has error input
             if(this.$el.querySelector('.custom-input--error')) return;
+            
             //formula reference: https://www.wikihow.com/Calculate-Total-Interest-Paid-on-a-Car-Loan
+            let count = this.isYearly ? this.duration * 12 : this.duration;
             let i = this.interestRate * 0.01 / 12;
-            let l = Math.pow(1 + i, this.duration);
+            let l = Math.pow(1 + i, count);
             let result = this.principalTotal * i * l / (l - 1);
 
             this.monthlyPayment = this.numFormat(Math.round(result)); 
             this.amortizationList = [];
             
             let principal, interest, date = new Date(this.startDate),
-                totalInterest = 0, balance = this.principalTotal, count = this.duration;
+                totalInterest = 0, balance = this.principalTotal;
 
             while(count >= 0) {
                 //set next month
@@ -116,7 +123,7 @@ export default {
                 this.amortizationList.push({
                     date: this.dateFormat(date),
                     monthlyPayment: this.monthlyPayment,
-                    principal: `$${this.numFormat(Math.round(principal))}`, 
+                    principal: this.numFormat(Math.round(principal)), 
                     interest: this.numFormat(Math.round(interest)), 
                     totalInterest: this.numFormat(Math.round(totalInterest)), 
                     balance: this.numFormat(Math.round(balance))
@@ -159,11 +166,16 @@ export default {
 }
 
 .calculator-form {
-    background-color: aquamarine;
+    background-color: $secondary;
 }
 
 .calculator-result {
     text-align: center;
+}
+
+.input-duration {
+    width: calc(100% - 140px);
+    display: inline-block;
 }
 
 .input-interest {
@@ -214,6 +226,9 @@ export default {
     }
     .input-date {
         width: calc(100% - 130px);
+    }
+    .table-title {
+        text-align: center;
     }
 }
 
