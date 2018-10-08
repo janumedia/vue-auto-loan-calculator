@@ -24,6 +24,7 @@ export default {
     position: relative;
     display: inline-block;
     height: 30px;
+    color: $secondary-text;
 }
 
 .switch input {display:none;}

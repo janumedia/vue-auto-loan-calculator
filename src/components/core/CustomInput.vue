@@ -53,6 +53,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/css/_color.scss";
+.custom-input {
+    color: $secondary-text;
+}
 .input-container {
     position: relative;
 }
@@ -68,7 +71,7 @@ export default {
     right: 0px;
 }
 input {
-    color: $font-color;
+    color: $secondary-text;
     width: 100%;
     height: 40px;
     margin-bottom: 24px;
