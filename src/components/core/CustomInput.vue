@@ -68,12 +68,13 @@ export default {
     right: 0px;
 }
 input {
+    color: $font-color;
     width: 100%;
     height: 40px;
     margin-bottom: 24px;
     padding: 0.4em 0;// 0.4em 15px;
     border:0;
-    border-bottom:1px solid rgb(167,172,162);
+    border-bottom:1px solid $border-color;
     background-color: inherit;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
@@ -94,13 +95,13 @@ input {
 }
 .text-error {
     display: block;
-    color: red;
+    color: $error;
     visibility: hidden;
 }
 .custom-input--error {
     input {
-        color: red;
-        border-bottom: 2px solid red;
+        color: $error;
+        border-bottom: 2px solid $error;
         margin-bottom: 8px;
     }
     .text-error {

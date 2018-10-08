@@ -2,37 +2,45 @@
     <div class="calculator-container">
         <div class="calculator">
             <div class="calculator-form">
-                <custom-input type="number" label="Car Price" prefix="$" :inValid="invalidCarPrice" @blur="calculate" v-model="carPrice"/>
+                <custom-input type="number" label="Car price" prefix="$" :inValid="invalidCarPrice" @blur="calculate" v-model="carPrice"/>
                 <custom-input label="Downpayment" prefix="$" :inValid="invalidDownpayment" @blur="calculate" v-model="downPayment"/>
                 <custom-input label="Loan duration (in month)" @blur="calculate" v-model="duration"/>
                 <div class="column">
                     <custom-input label="Interest rate" sufix="%" class="input-interest" :inValid="invalidInterestRate" @blur="calculate" v-model="interestRate"/>
                     <custom-input label="Start date" class="input-date" :inValid="invalidStartDate" @blur="calculate" v-model="startDate"/>
                 </div>
-                <button @click="calculate">Calculate</button>
+                <custom-button @click="calculate">Calculate</custom-button>
             </div>
             <div class="calculator-result">
                 <h2>Result:</h2>
                 <p>Estimate monthly payment</p>
                 <p class="label-monthly-payment">{{ monthlyPayment }}</p>
-                <p>Total Principal Paid <span class="bold">{{ `$${numFormat(loan)}` }}</span></p>
-                <p>Total Interest Paid <span class="bold">{{ `$${numFormat(interestTotal)}` }}</span></p>
+                <p>Total Principal Paid <span class="font--bold">{{ numFormat(principalTotal) }}</span></p>
+                <p>Total Interest Paid <span class="font--bold">{{ numFormat(interestTotal) }}</span></p>
                 <p>Estimated Payoff Date</p>
                 <p class="label-payoff-date">{{ payoffDate }}</p>
             </div>
         </div>
-        <Table v-show="amortizationList.length > 0"
-            :headers="headers"
-            :items="amortizationList"
-        />
+        <p v-show="amortizationList.length > 0" class="table-title font--bold">Amortization Schedule</p>
+        <Table v-show="amortizationList.length > 0">
+            <template slot="header">
+                <th v-for="(item, index) in headers" :key="index" :class="item.resposive ? 'responsive' : ''">{{ item.label }}</th>
+            </template>
+            <template slot="body">
+                <tr v-for="(item, index) in amortizationList" :key="index">
+                    <td v-for="(label, subIndex) in item" :key="subIndex" :class="subIndex == 'monthlyPayment' || subIndex == 'principal' ? 'responsive' : ''">{{ label }}</td>
+                </tr>
+            </template>
+        </Table>
     </div>
 </template>
 <script>
+import CustomButton from '@/components/core/CustomButton.vue'
 import CustomInput from '@/components/core/CustomInput.vue'
 import Table from '@/components/Table.vue'
 export default {
     components: {
-        CustomInput, Table
+        CustomButton, CustomInput, Table
     },
     mounted() {
         this.calculate();
@@ -47,28 +55,34 @@ export default {
             duration: 60,
             startDate: this.dateFormat(new Date()),
             payoffDate: this.dateFormat(new Date(), true),
-            headers: ["Payment Date", /*"Payment", "Principal", */"Interest", "Total Interest", "Balance"],
+            headers: [
+                    { label: "Payment Date" }, 
+                    { label: "Payment", resposive: true },
+                    { label: "Principal", resposive: true }, 
+                    { label: "Interest" }, 
+                    { label: "Total Interest" }, 
+                    { label: "Balance" }
+                    ],
             amortizationList: []
         }
     },
     computed: {
-        loan() {
+        principalTotal() {
             return this.carPrice - this.downPayment;
         }
     },
     methods: {
         invalidCarPrice() {
-            if(Number(this.carPrice) < 100) return "Price to low";
+            if(Number(this.carPrice) < 100 || Number(this.carPrice) < Number(this.downPayment)) return "Price to low";
             return false;
         },
         invalidDownpayment() {
-            if(this.downPayment.length == 0) return "Invalid downpayment";
+            if(Number(this.carPrice) < Number(this.downPayment)) return "Invalid downpayment";
             return false;
         },
         invalidInterestRate() {
             if(Number(this.interestRate) <= 0 || Number(this.interestRate) > 98) return "Invalid rate";
             return false;
-            
         },
         invalidStartDate() {
             let date =  new Date(this.startDate)
@@ -83,13 +97,13 @@ export default {
             //formula reference: https://www.wikihow.com/Calculate-Total-Interest-Paid-on-a-Car-Loan
             let i = this.interestRate * 0.01 / 12;
             let l = Math.pow(1 + i, this.duration);
-            let result = this.loan * i * l / (l - 1);
+            let result = this.principalTotal * i * l / (l - 1);
 
-            this.monthlyPayment = `$${this.numFormat(Math.round(result))}`; 
+            this.monthlyPayment = this.numFormat(Math.round(result)); 
             this.amortizationList = [];
             
             let principal, interest, date = new Date(this.startDate),
-                totalInterest = 0, balance = this.loan, count = this.duration;
+                totalInterest = 0, balance = this.principalTotal, count = this.duration;
 
             while(count >= 0) {
                 //set next month
@@ -101,11 +115,11 @@ export default {
                 if(balance < 0) balance = 0;
                 this.amortizationList.push({
                     date: this.dateFormat(date),
-                    //monthlyPayment: this.monthlyPayment,
-                    //principal: `$${this.numFormat(Math.round(principal))}`, 
-                    interest: `$${this.numFormat(Math.round(interest))}`, 
-                    totalInterest: `$${this.numFormat(Math.round(totalInterest))}`, 
-                    balance: `$${this.numFormat(Math.round(balance))}`
+                    monthlyPayment: this.monthlyPayment,
+                    principal: `$${this.numFormat(Math.round(principal))}`, 
+                    interest: this.numFormat(Math.round(interest)), 
+                    totalInterest: this.numFormat(Math.round(totalInterest)), 
+                    balance: this.numFormat(Math.round(balance))
                 });
                 balance -= principal;
                 count--;
@@ -113,11 +127,11 @@ export default {
             this.interestTotal = totalInterest;
             this.payoffDate = this.dateFormat(date, true);
         },
-        numFormat(number) {
+        numFormat(number, curcency='$') {
             if(number === undefined) return ""
             if(typeof number === "string") number = Number(number)
             //https://stackoverflow.com/a/14428340/1578100
-            return number.toFixed().replace(/(\d)(?=(\d{3})+(,|$))/g, '$1,')
+            return `${curcency}${number.toFixed().replace(/(\d)(?=(\d{3})+(,|$))/g, '$1,')}`;
         },
         dateFormat(date, locale) {
             if(locale) {
@@ -135,7 +149,7 @@ export default {
     width: 100%;
     margin: 0 0 20px;
     padding: 0;
-    border: solid 1px #ccc;
+    border: 1px solid $border-color;
     > div {
         display: inline-block;
         width: 50%;
@@ -152,33 +166,6 @@ export default {
     text-align: center;
 }
 
-button {
-    width: 100%;
-    height: 50px;
-    font-size: 1.6em;
-    font-weight: bold;
-    border: none;
-    border-radius: 0;
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;    
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    display:inline-block;
-    padding: 0;
-    vertical-align:middle;
-    text-decoration:none;
-    color:$primary-text;
-    background-color: $primary;
-    text-align:center;
-    cursor:pointer;
-    white-space:nowrap;
-    transition: 0.4s;
-    outline: none;
-    &:hover {
-        color: $primary;
-        background-color:white;
-    }
-}
 .input-interest {
     width: 120px;
     display: inline-block;
@@ -202,18 +189,9 @@ button {
     margin: 0;
 }
 
-.bold {
-    font-weight: bold;
-}
-
-// avoid zoom in iOS mobile device when entering input
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-    select,
-    textarea,
-    input,
-    button {
-        font-size: 16px;
-    }
+.table-title {
+    margin-top: 40px;
+    font-size: 1.2em;
 }
 
 @media only screen and (max-width:767px) {
@@ -221,6 +199,21 @@ button {
         > div {
             width: 100%;
         }
+    }
+    .responsive {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 414px) {
+    .calculator {
+        border: 0;
+    }
+    .input-interest {
+        width: 90px;
+    }
+    .input-date {
+        width: calc(100% - 130px);
     }
 }
 

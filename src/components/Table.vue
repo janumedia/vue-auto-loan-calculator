@@ -2,31 +2,26 @@
     <table>
         <thead>
             <tr>
-                <th v-for="(title, index) in headers" :key="index">{{ title }}</th>
+                <slot name="header"/>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(item, index) in items" :key="index">
-                <td v-for="(label, subIndex) in item" :key="subIndex">{{ label }}</td>
-            </tr>
+            <slot name="body"/>
         </tbody>        
     </table>
 </template>
-<script>
-export default {
-    props: ["headers", "items"]
-}
-</script>
 <style lang="scss" scoped>
+@import "@/assets/css/_color.scss";
 table {
     border-collapse: collapse;
-    border: 1px solid #ccc;
+    border: 1px solid $border-color;
     width: 100%;
 }
 td, th {
-    border: 1px solid #ccc;
-    text-align: left;
-    padding: 8px;
+    border: 1px solid $border-color;
+    border-left: 0;
+    border-right: 0;
+    padding: 12px 8px;
     text-align: center;
 }
 th {
@@ -35,5 +30,14 @@ th {
 }
 tr:nth-child(even) {
     background-color: #eee;
+}
+@media only screen and (max-width: 414px) {
+    table {
+        border-left: 0;
+        border-right: 0;
+    }
+    th {
+        font-size: 0.8em;
+    }
 }
 </style>

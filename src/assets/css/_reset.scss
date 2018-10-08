@@ -1,6 +1,14 @@
-body {
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import '_color.scss';
+
+body, html {
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    color: $font-color;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     padding: 20px;
-    margin: 0;
+    margin: 0; 
 }
 
 *, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -10,8 +18,24 @@ li { list-style: none; }
 a { text-decoration: none; outline: none; }
 a img { border: 0; }
 
+// avoid zoom in iOS mobile device when entering input
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select,
+    textarea,
+    input,
+    button {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width:600px) {
+    h1 {
+        font-size: 1.5em;
+    }
+}
+
 @media only screen and (max-width:414px) {
-    body {
+    body, html {
         padding: 0;
     }
 }
