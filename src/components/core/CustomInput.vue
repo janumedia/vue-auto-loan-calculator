@@ -29,7 +29,7 @@ export default {
         inputType() {
             switch(this.type.toLowerCase()) {
                 case 'date':
-                    return isMobile() ? 'number' : 'text';
+                    return 'text';
                 case 'number':
                     return isMobile() ? 'tel' : this.type;
                 default:
