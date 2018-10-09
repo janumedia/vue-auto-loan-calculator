@@ -3,13 +3,14 @@
         <label>{{ label }}</label>
         <div class="input-container">
             <span class="prefix" v-if="prefix">{{ prefix }}</span>
-            <input :type="type" :class="prefix ? 'has-prefix' : sufix ? 'has-sufix' : ''" @input="handleInput" @blur="handleBlur" v-model="content">
+            <input :type="inputType" :pattern="inputPattern" :class="prefix ? 'has-prefix' : sufix ? 'has-sufix' : ''" @input="handleInput" @blur="handleBlur" v-model="content">
             <span class="sufix" v-if="sufix">{{ sufix }}</span>
             <span class="text-error">{{ errorText }}</span>
         </div>
     </div>
 </template>
 <script>
+import { isMobile } from '@/utils/Utils'
 export default {
     props: {
         type:String,
@@ -25,6 +26,22 @@ export default {
         }
     },
     computed: {
+        inputType() {
+            switch(this.type.toLowerCase()) {
+                case 'date':
+                    return 'text';
+                case 'number':
+                    return isMobile() ? 'tel' : this.type;
+                default:
+                    return this.type;
+            }
+        },
+        inputPattern() {
+            const type = this.type.toLowerCase();
+            if(type == 'number') return '^[0-9]*$';
+            if(type == 'date') return '^[0-9\/\\]*$';
+            return '';
+        },
         content:{
             get: function() {
                 return this.value;

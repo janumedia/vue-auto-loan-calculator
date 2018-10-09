@@ -3,14 +3,14 @@
         <div class="calculator">
             <div class="calculator-form">
                 <custom-input type="number" label="Car price" prefix="$" :inValid="invalidCarPrice" @blur="calculate" v-model="carPrice"/>
-                <custom-input label="Downpayment" prefix="$" :inValid="invalidDownpayment" @blur="calculate" v-model="downPayment"/>
+                <custom-input type="number" label="Downpayment" prefix="$" :inValid="invalidDownpayment" @blur="calculate" v-model="downPayment"/>
                 <div>
-                    <custom-input label="Loan duration" class="input-duration" @blur="calculate" v-model="duration"/>
+                    <custom-input type="number" label="Loan duration" class="input-duration" @blur="calculate" v-model="duration"/>
                     <toggle-button @change="calculate" v-model="isYearly"/>
                 </div>
                 <div>
-                    <custom-input label="Interest rate" sufix="%" class="input-interest" :inValid="invalidInterestRate" @blur="calculate" v-model="interestRate"/>
-                    <custom-input label="Start date" class="input-date" :inValid="invalidStartDate" @blur="calculate" v-model="startDate"/>
+                    <custom-input type="number" label="Interest rate" sufix="%" class="input-interest" :inValid="invalidInterestRate" @blur="calculate" v-model="interestRate"/>
+                    <custom-input type="date" label="Start date" class="input-date" :inValid="invalidStartDate" @blur="calculate" v-model="startDate"/>
                 </div>
                 <custom-button @click="calculate">Calculate</custom-button>
             </div>
@@ -44,6 +44,7 @@ import CustomButton from '@/components/core/CustomButton.vue'
 import CustomInput from '@/components/core/CustomInput.vue'
 import ToggleButton from '@/components/core/ToggleButton.vue'
 import Table from '@/components/Table.vue'
+import { numFormat, dateFormat } from '@/utils/Utils'
 export default {
     components: {
         CustomButton, CustomInput, ToggleButton, Table
@@ -136,19 +137,8 @@ export default {
             this.interestTotal = totalInterest;
             this.payoffDate = this.dateFormat(date, true);
         },
-        numFormat(number, curcency='$') {
-            if(number === undefined) return ""
-            if(typeof number === "string") number = Number(number)
-            //https://stackoverflow.com/a/14428340/1578100
-            return `${curcency}${number.toFixed().replace(/(\d)(?=(\d{3})+(,|$))/g, '$1,')}`;
-        },
-        dateFormat(date, locale) {
-            if(locale) {
-                let options = { year: 'numeric', month: 'long', day: 'numeric' };
-                return date.toLocaleDateString("en-US", options);
-            }
-            return `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
-        }
+        numFormat,
+        dateFormat
     }
 }
 </script>
